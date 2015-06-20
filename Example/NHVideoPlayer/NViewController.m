@@ -7,8 +7,10 @@
 //
 
 #import "NViewController.h"
-
+#import <NHVideoPlayerView.h>
 @interface NViewController ()
+
+@property (nonatomic, strong) NHVideoPlayerView *videoPlayer;
 
 @end
 
@@ -17,7 +19,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+    
+    self.videoPlayer = [[NHVideoPlayerView alloc] initWithFrame:CGRectMake(0, 100, 320, 170)];
+    self.videoPlayer.videoUrl = [NSURL URLWithString:@"http://content.viki.com/test_ios/ios_240.m3u8"];
+    
+    
+    [self.view addSubview:self.videoPlayer];
+    
+    
 }
 
 - (void)didReceiveMemoryWarning
