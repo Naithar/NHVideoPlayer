@@ -21,7 +21,10 @@
 @property (nonatomic, strong) NHVideoPlayer *videoPlayerView;
 
 @property (nonatomic, strong) UIView *bottomBarView;
+@property (nonatomic, strong) UIButton *zoomOutButton;
+@property (nonatomic, strong) UIButton *playButton;
 
+@property (nonatomic, strong) UITapGestureRecognizer *tapGesture;
 @property (nonatomic, strong) id resignActive;
 @property (nonatomic, strong) id enterForeground;
 
@@ -79,10 +82,38 @@
     self.aspectButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.aspectButton.tintColor = [UIColor whiteColor];
     [self.aspectButton setTitle:nil forState:UIControlStateNormal];
-    [self.aspectButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.close.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self.aspectButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.aspect.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [self.aspectButton addTarget:self action:@selector(aspectButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
     [self.topBarView addSubview:self.aspectButton];
     [self setupAspectButtonConstraints];
+    
+    self.bottomBarView = [[UIView alloc] init];
+    self.bottomBarView.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.75];
+    self.bottomBarView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.bottomBarView];
+    [self setupBottomBarViewConstraints];
+    
+    self.zoomOutButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    self.zoomOutButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.zoomOutButton.tintColor = [UIColor whiteColor];
+    [self.zoomOutButton setTitle:nil forState:UIControlStateNormal];
+    [self.zoomOutButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.zoom-out.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self.zoomOutButton addTarget:self action:@selector(closeButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
+    [self.bottomBarView addSubview:self.zoomOutButton];
+    [self setupZoomOutButtonConstraints];
+    
+    self.playButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.playButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.playButton.tintColor = [UIColor whiteColor];
+    [self.playButton setTitle:nil forState:UIControlStateNormal];
+    [self.playButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.play-main.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self.playButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.pause.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateSelected];
+    [self.playButton addTarget:self action:@selector(playButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
+    [self.bottomBarView addSubview:self.playButton];
+    [self setupPlayButtonConstraints];
+    
+    self.tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureAction:)];
+    [self.videoPlayerView addGestureRecognizer:self.tapGesture];
     
     __weak __typeof(self) weakSelf = self;
     self.resignActive = [[NSNotificationCenter defaultCenter]
@@ -136,6 +167,39 @@
     else {
         self.videoPlayerView.videoLayer.videoGravity = AVLayerVideoGravityResizeAspect;
     }
+}
+
+- (void)playButtonTouch:(id)sender {
+    if (self.videoPlayerView.videoPlayer.status == AVPlayerStatusReadyToPlay) {
+        if (self.videoPlayerView.videoPlayer.rate == 0) {
+            [self play];
+        }
+        else {
+            [self pause];
+        }
+    }
+}
+
+- (void)tapGestureAction:(id)sender {
+    [self changeVisibilityState];
+    
+    if (self.videoPlayerView.videoPlayer.rate != 0) {
+        [self performSelector:@selector(hideBars) withObject:nil afterDelay:4];
+    }
+}
+
+- (void)changeVisibilityState {
+    [UIView animateWithDuration:0.5 animations:^{
+        self.topBarView.alpha = self.topBarView.alpha == 0 ? 1 : 0;
+        self.bottomBarView.alpha = self.bottomBarView.alpha == 0 ? 1 : 0;
+    }];
+}
+
+- (void)hideBars {
+    [UIView animateWithDuration:0.5 animations:^{
+        self.topBarView.alpha = 0;
+        self.bottomBarView.alpha = 0;
+    }];
 }
 
 - (void)setupVideoPlayerViewConstraints {
@@ -258,6 +322,96 @@
                                                                 multiplier:0 constant:44]];
 }
 
+- (void)setupBottomBarViewConstraints {
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.bottomBarView
+                                                          attribute:NSLayoutAttributeBottom
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeBottom
+                                                         multiplier:1.0 constant:0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.bottomBarView
+                                                          attribute:NSLayoutAttributeRight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeRight
+                                                         multiplier:1.0 constant:0]];
+    
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.bottomBarView
+                                                          attribute:NSLayoutAttributeLeft
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeLeft
+                                                         multiplier:1.0 constant:0]];
+    
+    [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.bottomBarView
+                                                                attribute:NSLayoutAttributeHeight
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.bottomBarView
+                                                                attribute:NSLayoutAttributeHeight
+                                                               multiplier:0 constant:50]];
+}
+
+- (void)setupZoomOutButtonConstraints {
+    [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.zoomOutButton
+                                                                attribute:NSLayoutAttributeCenterY
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.bottomBarView
+                                                                attribute:NSLayoutAttributeCenterY
+                                                               multiplier:1.0 constant:0]];
+    
+    [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.zoomOutButton
+                                                                attribute:NSLayoutAttributeRight
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.bottomBarView
+                                                                attribute:NSLayoutAttributeRight
+                                                               multiplier:1.0 constant:0]];
+    
+    [self.zoomOutButton addConstraint:[NSLayoutConstraint constraintWithItem:self.zoomOutButton
+                                                                  attribute:NSLayoutAttributeWidth
+                                                                  relatedBy:NSLayoutRelationEqual
+                                                                     toItem:self.zoomOutButton
+                                                                  attribute:NSLayoutAttributeWidth
+                                                                 multiplier:0 constant:44]];
+    
+    [self.zoomOutButton addConstraint:[NSLayoutConstraint constraintWithItem:self.zoomOutButton
+                                                                  attribute:NSLayoutAttributeHeight
+                                                                  relatedBy:NSLayoutRelationEqual
+                                                                     toItem:self.zoomOutButton
+                                                                  attribute:NSLayoutAttributeHeight
+                                                                 multiplier:0 constant:44]];
+}
+
+- (void)setupPlayButtonConstraints {
+    [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.playButton
+                                                                   attribute:NSLayoutAttributeCenterY
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.bottomBarView
+                                                                   attribute:NSLayoutAttributeCenterY
+                                                                  multiplier:1.0 constant:0]];
+    
+    [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.playButton
+                                                                   attribute:NSLayoutAttributeLeft
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.bottomBarView
+                                                                   attribute:NSLayoutAttributeLeft
+                                                                  multiplier:1.0 constant:0]];
+    
+    [self.playButton addConstraint:[NSLayoutConstraint constraintWithItem:self.playButton
+                                                                   attribute:NSLayoutAttributeWidth
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.playButton
+                                                                   attribute:NSLayoutAttributeWidth
+                                                                  multiplier:0 constant:44]];
+    
+    [self.playButton addConstraint:[NSLayoutConstraint constraintWithItem:self.playButton
+                                                                   attribute:NSLayoutAttributeHeight
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.playButton
+                                                                   attribute:NSLayoutAttributeHeight
+                                                                  multiplier:0 constant:44]];
+}
+
 - (BOOL)prefersStatusBarHidden {
     return YES;
 }
@@ -265,22 +419,28 @@
 - (void)play {
     self.videoPlayerView.videoPlayer.rate = 1;
     [self.videoPlayerView.videoPlayer play];
+    self.playButton.selected = YES;
+    
+    [self performSelector:@selector(hideBars) withObject:nil afterDelay:2];
 }
 
 - (void)pause {
     self.videoPlayerView.videoPlayer.rate = 0;
     [self.videoPlayerView.videoPlayer pause];
+    self.playButton.selected = NO;
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideBars) object:nil];
 }
 
 - (void)resetState {
-//    self.playButton.hidden = self.videoPlayer.rate != 0;
+    self.playButton.selected = self.videoPlayerView.videoPlayer.rate != 0;
 }
 
 - (void)videoPlayer:(NHVideoPlayer *)player didChangeStatus:(AVPlayerStatus)status {
     if (status == AVPlayerStatusReadyToPlay) {
         [self.videoPlayerView.videoPlayer seekToTime:CMTimeMakeWithSeconds(self.initialTime, self.videoPlayerView.videoPlayerItem.asset.duration.timescale)];
         if (self.initialPlay) {
-            [self.videoPlayerView.videoPlayer play];
+            [self play];
         }
     }
 }
@@ -293,6 +453,8 @@
 }
 
 - (void)dealloc {
+    [self pause];
+    [self.videoPlayerView removeGestureRecognizer:self.tapGesture];
     [self.videoPlayerView clear];
     [self.videoPlayerView removeFromSuperview];
     self.videoPlayerView = nil;

@@ -321,7 +321,9 @@
     self.durationLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", minutes, seconds];
 }
 
-- (void)playerViewController:(NHVideoPlayerViewController *)controller didDismissWithTime:(NSTimeInterval)seconds andPlaying:(BOOL)playing {
+- (void)playerViewController:(NHVideoPlayerViewController *)controller
+          didDismissWithTime:(NSTimeInterval)seconds
+                  andPlaying:(BOOL)playing {
     [self.videoPlayer seekToTime:CMTimeMakeWithSeconds(seconds, self.videoPlayerItem.asset.duration.timescale)];
     
     if (playing) {
