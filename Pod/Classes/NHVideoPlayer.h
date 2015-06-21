@@ -17,6 +17,7 @@
 - (void)videoPlayer:(NHVideoPlayer*)player didChangeCurrentTime:(CMTime)time;
 - (void)didPlayToEndForVideoPlayer:(NHVideoPlayer*)player;
 - (BOOL)shouldResetDurationForVideoPlayer:(NHVideoPlayer*)player;
+- (void)videoPlayer:(NHVideoPlayer *)player didChangeStatus:(AVPlayerStatus)status;
 
 @end
 
@@ -30,4 +31,5 @@
 
 - (instancetype)initWithVideoPlayerItem:(AVPlayerItem*)item andPlayer:(AVPlayer*)player;
 - (AVPlayerLayer*)videoLayer;
+- (void)clear;
 @end

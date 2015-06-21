@@ -83,7 +83,7 @@
 
 - (void)resetVideoPlayerOnUrl {
     [self.videoPlayer pause];
-    
+
     self.videoPlayerItem = [AVPlayerItem playerItemWithURL:self.videoUrl];
     self.videoPlayer = [AVPlayer playerWithPlayerItem:self.videoPlayerItem];
     
@@ -142,7 +142,7 @@
     __weak __typeof(self) weakSelf = self;
     self.videoEndObserver = [[NSNotificationCenter defaultCenter]
                              addObserverForName:AVPlayerItemDidPlayToEndTimeNotification
-                             object:self.videoPlayer
+                             object:self.videoPlayerItem
                              queue:nil usingBlock:^(NSNotification *note) {
                                  
                                  if ([weakSelf.nhDelegate respondsToSelector:@selector(didPlayToEndForVideoPlayer:)]) {
@@ -152,6 +152,27 @@
                                  __strong __typeof(weakSelf) strongSelf = weakSelf;
                                  [strongSelf resetVideoDuration];
                              }];
+    
+    [self.videoPlayer addObserver:self
+                       forKeyPath:@"status"
+                          options:NSKeyValueObservingOptionNew
+                          context:nil];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context {
+    if (object == self.videoPlayer) {
+        if ([keyPath isEqualToString:@"status"]) {
+            AVPlayerStatus status = [change[NSKeyValueChangeNewKey] unsignedIntegerValue];
+            
+            __weak __typeof(self) weakSelf = self;
+            if ([weakSelf.nhDelegate respondsToSelector:@selector(videoPlayer:didChangeStatus:)]) {
+                [weakSelf.nhDelegate videoPlayer:weakSelf didChangeStatus:status];
+            }
+        }
+    }
 }
 
 - (void)resetVideoDuration {
@@ -170,13 +191,26 @@
 }
 
 - (void)removeVideoObserver {
-    [[NSNotificationCenter defaultCenter] removeObserver:self.videoEndObserver];
+    if (self.videoEndObserver != nil) {
+        [self.videoPlayer removeObserver:self forKeyPath:@"status"];
+        [[NSNotificationCenter defaultCenter] removeObserver:self.videoEndObserver];
+        self.videoEndObserver = nil;
+    }
+}
+
+- (void)clear {
+    [self removeVideoObserver];
+    [self.videoPlayer pause];
+    self.videoPlayerItem = nil;
+    self.videoPlayer = nil;
+    [[self videoLayer] setPlayer:nil];
+    [[self videoLayer] removeFromSuperlayer];
+    self.nhDelegate = nil;
+    [self stopTimer];
 }
 
 - (void)dealloc {
-    [self.videoPlayer pause];
-    [self stopTimer];
-    [self removeVideoObserver];
+    [self clear];
 }
 
 

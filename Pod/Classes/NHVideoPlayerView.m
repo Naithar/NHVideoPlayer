@@ -7,9 +7,9 @@
 //
 
 #import "NHVideoPlayerView.h"
-#import "NHVideoPlayerNavigationController.h"
+#import "NHVideoPlayerViewController.h"
 
-@interface NHVideoPlayerView ()<NHVideoPlayerDelegate>
+@interface NHVideoPlayerView ()<NHVideoPlayerDelegate, NHVideoPlayerViewControllerDelegate>
 
 @property (nonatomic, strong) UIButton *playButton;
 @property (nonatomic, strong) UITapGestureRecognizer *tapGesture;
@@ -60,7 +60,7 @@
 - (void)nhCommonInit {
     
     self.nhDelegate = self;
-    [self videoLayer].fillMode = AVLayerVideoGravityResizeAspect;
+    [self videoLayer].videoGravity = AVLayerVideoGravityResizeAspect;
     
     self.playButton = [UIButton buttonWithType:UIButtonTypeCustom];
     self.playButton.translatesAutoresizingMaskIntoConstraints = NO;
@@ -269,19 +269,17 @@
 
 - (void)playButtonTouch:(id)sender {
     if (self.videoPlayer.status == AVPlayerStatusReadyToPlay) {
-        self.playButton.hidden = YES;
-        [self.videoPlayer play];
+        [self play];
     }
 }
 
 - (void)tapGestureAction:(id)sender {
     if (self.videoPlayer.status == AVPlayerStatusReadyToPlay) {
         if (self.videoPlayer.rate == 0) {
-            [self playButtonTouch:nil];
+            [self play];
         }
         else {
-            self.playButton.hidden = NO;
-            [self.videoPlayer pause];
+            [self pause];
         }
     }
 }
@@ -292,14 +290,24 @@
 }
 
 - (void)openButtonTouch:(id)sender {
-    NHVideoPlayerNavigationController *viewController = [[NHVideoPlayerNavigationController alloc] init];
+    
+    BOOL wasPlaying = self.videoPlayer.rate != 0;
+    
+    [self pause];
+    NHVideoPlayerViewController *viewController = [[NHVideoPlayerViewController alloc]
+                                                         initWithPlayerUrl:self.videoUrl];
+    
+    viewController.initialView = self;
+    viewController.initialTime = self.videoPlayer.currentTime.value / self.videoPlayer.currentTime.timescale;
+    viewController.initialPlay = wasPlaying;
+    viewController.nhDelegate = self;
     
     [UIView transitionWithView:self.window
                       duration:0.5
                        options:UIViewAnimationOptionTransitionCrossDissolve
                     animations:^{
                         [self.window.rootViewController presentViewController:viewController
-                                                                     animated:YES
+                                                                     animated:NO
                                                                    completion:nil];
                     } completion:nil];
 }
@@ -313,16 +321,37 @@
     self.durationLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", minutes, seconds];
 }
 
+- (void)playerViewController:(NHVideoPlayerViewController *)controller didDismissWithTime:(NSTimeInterval)seconds andPlaying:(BOOL)playing {
+    [self.videoPlayer seekToTime:CMTimeMakeWithSeconds(seconds, self.videoPlayerItem.asset.duration.timescale)];
+    
+    if (playing) {
+        [self play];
+    }
+    else {
+        [self pause];
+    }
+}
+
 - (void)resetState {
     self.playButton.hidden = self.videoPlayer.rate != 0;
 }
 
 - (void)didPlayToEndForVideoPlayer:(NHVideoPlayer *)player {
+    [self pause];
+}
+
+- (void)play {
+    self.playButton.hidden = YES;
+    [self.videoPlayer play];
+}
+
+- (void)pause {
     self.playButton.hidden = NO;
     [self.videoPlayer pause];
 }
 
 -(void)dealloc {
+    [self clear];
     [[NSNotificationCenter defaultCenter] removeObserver:self.resignActive];
     [[NSNotificationCenter defaultCenter] removeObserver:self.enterForeground];
 }
