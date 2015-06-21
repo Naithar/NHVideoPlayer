@@ -27,6 +27,10 @@
 
 @implementation NHVideoPlayerView
 
++ (Class)videoControllerClass {
+    return [NHVideoPlayerViewController class];
+}
+
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     
@@ -294,7 +298,7 @@
     BOOL wasPlaying = self.videoPlayer.rate != 0;
     
     [self pause];
-    NHVideoPlayerViewController *viewController = [[NHVideoPlayerViewController alloc]
+    NHVideoPlayerViewController *viewController = [[[[self class] videoControllerClass] alloc]
                                                          initWithPlayerUrl:self.videoUrl];
     
     viewController.initialView = self;

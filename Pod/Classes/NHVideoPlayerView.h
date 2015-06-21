@@ -19,4 +19,5 @@
 
 @property (nonatomic, readonly, strong) UIButton *openButton;
 
++ (Class)videoControllerClass;
 @end
