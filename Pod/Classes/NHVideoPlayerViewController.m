@@ -111,8 +111,8 @@
 
 - (void)dismiss {
     BOOL wasPlaying = self.videoPlayerView.videoPlayer.rate != 0;
-    [self.videoPlayerView.videoPlayer pause];
-    NSTimeInterval time = self.videoPlayerView.videoPlayer.currentTime.value / self.videoPlayerView.videoPlayer.currentTime.timescale;
+    [self pause];
+    NSTimeInterval time = CMTimeGetSeconds(self.videoPlayerView.videoPlayer.currentTime);
     
     [UIView transitionWithView:self.view.window
                       duration:0.5
@@ -263,10 +263,12 @@
 }
 
 - (void)play {
+    self.videoPlayerView.videoPlayer.rate = 1;
     [self.videoPlayerView.videoPlayer play];
 }
 
 - (void)pause {
+    self.videoPlayerView.videoPlayer.rate = 0;
     [self.videoPlayerView.videoPlayer pause];
 }
 

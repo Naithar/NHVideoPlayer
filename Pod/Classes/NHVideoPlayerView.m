@@ -298,7 +298,7 @@
                                                          initWithPlayerUrl:self.videoUrl];
     
     viewController.initialView = self;
-    viewController.initialTime = self.videoPlayer.currentTime.value / self.videoPlayer.currentTime.timescale;
+    viewController.initialTime = CMTimeGetSeconds(self.videoPlayer.currentTime);
     viewController.initialPlay = wasPlaying;
     viewController.nhDelegate = self;
     
@@ -343,10 +343,12 @@
 - (void)play {
     self.playButton.hidden = YES;
     [self.videoPlayer play];
+    self.videoPlayer.rate = 1;
 }
 
 - (void)pause {
     self.playButton.hidden = NO;
+    self.videoPlayer.rate = 0;
     [self.videoPlayer pause];
 }
 
