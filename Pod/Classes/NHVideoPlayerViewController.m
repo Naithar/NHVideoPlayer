@@ -15,8 +15,9 @@
 
 @property (nonatomic, strong) UIView *topBarView;
 @property (nonatomic, strong) UIButton *closeButton;
+@property (nonatomic, strong) UIButton *muteButton;
 @property (nonatomic, strong) UIButton *aspectButton;
-@property (nonatomic, strong) UILabel *titleLabel;
+
 
 @property (nonatomic, strong) NHVideoPlayer *videoPlayerView;
 
@@ -32,7 +33,7 @@
 
 @property (nonatomic, assign) BOOL sliderEditing;
 
-@property (nonatomic, strong) UIButton *muteButton;
+
 
 @property (nonatomic, strong) id resignActive;
 @property (nonatomic, strong) id enterForeground;
@@ -202,7 +203,7 @@
     BOOL wasPlaying = self.videoPlayerView.videoPlayer.rate != 0;
     [self pause];
     NSTimeInterval time = CMTimeGetSeconds(self.videoPlayerView.videoPlayer.currentTime);
-    
+//
     [UIView transitionWithView:self.view.window
                       duration:0.5
                        options:UIViewAnimationOptionTransitionCrossDissolve
@@ -652,6 +653,8 @@
     
     if (!self.sliderEditing) {
         self.videoSliderView.value = duration;
+        
+        [self.initialView.videoPlayer seekToTime:CMTimeMakeWithSeconds(duration, self.initialView.videoPlayerItem.asset.duration.timescale)];
     }
     
     long minutes = duration / 60;

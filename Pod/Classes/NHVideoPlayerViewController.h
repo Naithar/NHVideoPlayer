@@ -25,6 +25,21 @@
 
 @property (nonatomic, readonly, strong) NHVideoPlayer *videoPlayerView;
 
+@property (nonatomic, readonly, strong) UIView *topBarView;
+@property (nonatomic, readonly, strong) UIButton *closeButton;
+@property (nonatomic, readonly, strong) UIButton *muteButton;
+@property (nonatomic, readonly, strong) UIButton *aspectButton;
+
+@property (nonatomic, readonly, strong) UIView *bottomBarView;
+@property (nonatomic, readonly, strong) UIButton *zoomOutButton;
+@property (nonatomic, readonly, strong) UIButton *playButton;
+
+@property (nonatomic, readonly, strong) UILabel *currentTimeLabel;
+@property (nonatomic, readonly, strong) UILabel *durationTimeLabel;
+@property (nonatomic, readonly, strong) UISlider *videoSliderView;
+
+@property (nonatomic, readonly, assign) BOOL sliderEditing;
+
 @property (nonatomic, weak) NHVideoPlayer *initialView;
 @property (nonatomic, assign) NSTimeInterval initialTime;
 @property (nonatomic, assign) BOOL initialPlay;
