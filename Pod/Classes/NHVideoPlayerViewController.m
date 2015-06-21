@@ -24,7 +24,16 @@
 @property (nonatomic, strong) UIButton *zoomOutButton;
 @property (nonatomic, strong) UIButton *playButton;
 
+@property (nonatomic, strong) UILabel *currentTimeLabel;
+@property (nonatomic, strong) UILabel *durationTimeLabel;
+@property (nonatomic, strong) UISlider *videoSliderView;
+
 @property (nonatomic, strong) UITapGestureRecognizer *tapGesture;
+
+@property (nonatomic, assign) BOOL sliderEditing;
+
+@property (nonatomic, strong) UIButton *muteButton;
+
 @property (nonatomic, strong) id resignActive;
 @property (nonatomic, strong) id enterForeground;
 
@@ -41,6 +50,10 @@
     }
     
     return self;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
 }
 
 - (void)commonInit {
@@ -63,7 +76,7 @@
     [self setupVideoPlayerViewConstraints];
     
     self.topBarView = [[UIView alloc] init];
-    self.topBarView.backgroundColor = [[UIColor blueColor] colorWithAlphaComponent:0.75];
+    self.topBarView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.75];
     self.topBarView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.topBarView];
     
@@ -87,8 +100,18 @@
     [self.topBarView addSubview:self.aspectButton];
     [self setupAspectButtonConstraints];
     
+    self.muteButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.muteButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.muteButton.backgroundColor = [UIColor clearColor];
+    self.muteButton.tintColor = [UIColor whiteColor];
+    [self.muteButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.sound.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self.muteButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.mute.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateSelected];
+    [self.muteButton addTarget:self action:@selector(muteButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
+    [self.topBarView addSubview:self.muteButton];
+    [self setupMuteButtonConstraints];
+    
     self.bottomBarView = [[UIView alloc] init];
-    self.bottomBarView.backgroundColor = [[UIColor redColor] colorWithAlphaComponent:0.75];
+    self.bottomBarView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.75];
     self.bottomBarView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.bottomBarView];
     [self setupBottomBarViewConstraints];
@@ -114,6 +137,41 @@
     
     self.tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureAction:)];
     [self.videoPlayerView addGestureRecognizer:self.tapGesture];
+    
+    self.currentTimeLabel = [[UILabel alloc] init];
+    self.currentTimeLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    self.currentTimeLabel.text = @"00:00";
+    self.currentTimeLabel.textColor = [UIColor whiteColor];
+    self.currentTimeLabel.font = [UIFont systemFontOfSize:14];
+    self.currentTimeLabel.textAlignment = NSTextAlignmentLeft;
+    [self.bottomBarView addSubview:self.currentTimeLabel];
+    self.currentTimeLabel.adjustsFontSizeToFitWidth = YES;
+    self.currentTimeLabel.minimumScaleFactor = 0.8;
+    [self setupCurrentTimeLabelConstraints];
+    
+    self.durationTimeLabel = [[UILabel alloc] init];
+    self.durationTimeLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    self.durationTimeLabel.text = @"00:00";
+    self.durationTimeLabel.textAlignment = NSTextAlignmentRight;
+    self.durationTimeLabel.textColor = [UIColor whiteColor];
+    self.durationTimeLabel.font = [UIFont systemFontOfSize:14];
+    [self.bottomBarView addSubview:self.durationTimeLabel];
+    self.durationTimeLabel.adjustsFontSizeToFitWidth = YES;
+    self.durationTimeLabel.minimumScaleFactor = 0.8;
+    [self setupDurationTimeLabelConstraints];
+    
+    self.videoSliderView = [[UISlider alloc] init];
+    self.videoSliderView.backgroundColor = [UIColor clearColor];
+    self.videoSliderView.minimumTrackTintColor = [UIColor blueColor];
+    self.videoSliderView.tintColor = [UIColor whiteColor];
+    self.videoSliderView.maximumTrackTintColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.8];
+    self.videoSliderView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.bottomBarView addSubview:self.videoSliderView];
+    [self.videoSliderView setThumbImage:[[UIImage imageNamed:@"NHVideoPlayer.slider.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self setupVideoSliderBarView];
+    [self.videoSliderView addTarget:self action:@selector(videoSliderStartChange:) forControlEvents:UIControlEventTouchDown];
+    [self.videoSliderView addTarget:self action:@selector(videoSliderViewDidChange:) forControlEvents:UIControlEventValueChanged];
+    [self.videoSliderView addTarget:self action:@selector(videoSliderStopChange:) forControlEvents:UIControlEventTouchCancel|UIControlEventTouchUpInside|UIControlEventTouchUpOutside];
     
     __weak __typeof(self) weakSelf = self;
     self.resignActive = [[NSNotificationCenter defaultCenter]
@@ -180,6 +238,11 @@
     }
 }
 
+- (void)muteButtonTouch:(id)sender {
+    [self.videoPlayerView.videoPlayer setMuted:!self.muteButton.selected];
+    self.muteButton.selected = self.videoPlayerView.videoPlayer.isMuted;
+}
+
 - (void)tapGestureAction:(id)sender {
     [self changeVisibilityState];
     
@@ -192,6 +255,13 @@
     [UIView animateWithDuration:0.5 animations:^{
         self.topBarView.alpha = self.topBarView.alpha == 0 ? 1 : 0;
         self.bottomBarView.alpha = self.bottomBarView.alpha == 0 ? 1 : 0;
+    }];
+}
+
+- (void)showBars {
+    [UIView animateWithDuration:0.5 animations:^{
+        self.topBarView.alpha = 1;
+        self.bottomBarView.alpha = 1;
     }];
 }
 
@@ -412,6 +482,126 @@
                                                                   multiplier:0 constant:44]];
 }
 
+- (void)setupCurrentTimeLabelConstraints {
+    [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.currentTimeLabel
+                                                                   attribute:NSLayoutAttributeCenterY
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.bottomBarView
+                                                                   attribute:NSLayoutAttributeCenterY
+                                                                  multiplier:1.0 constant:0]];
+    
+    [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.currentTimeLabel
+                                                                   attribute:NSLayoutAttributeLeft
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.playButton
+                                                                   attribute:NSLayoutAttributeRight
+                                                                  multiplier:1.0 constant:0]];
+    
+    [self.currentTimeLabel addConstraint:[NSLayoutConstraint constraintWithItem:self.currentTimeLabel
+                                                                attribute:NSLayoutAttributeWidth
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.currentTimeLabel
+                                                                attribute:NSLayoutAttributeWidth
+                                                               multiplier:0 constant:55]];
+    
+    [self.currentTimeLabel addConstraint:[NSLayoutConstraint constraintWithItem:self.currentTimeLabel
+                                                                attribute:NSLayoutAttributeHeight
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.currentTimeLabel
+                                                                attribute:NSLayoutAttributeHeight
+                                                               multiplier:0 constant:44]];
+}
+
+- (void)setupDurationTimeLabelConstraints {
+    [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.durationTimeLabel
+                                                                   attribute:NSLayoutAttributeCenterY
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.bottomBarView
+                                                                   attribute:NSLayoutAttributeCenterY
+                                                                  multiplier:1.0 constant:0]];
+    
+    [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.durationTimeLabel
+                                                                   attribute:NSLayoutAttributeRight
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.zoomOutButton
+                                                                   attribute:NSLayoutAttributeLeft
+                                                                  multiplier:1.0 constant:0]];
+    
+    [self.durationTimeLabel addConstraint:[NSLayoutConstraint constraintWithItem:self.durationTimeLabel
+                                                                      attribute:NSLayoutAttributeWidth
+                                                                      relatedBy:NSLayoutRelationEqual
+                                                                         toItem:self.durationTimeLabel
+                                                                      attribute:NSLayoutAttributeWidth
+                                                                     multiplier:0 constant:55]];
+    
+    [self.durationTimeLabel addConstraint:[NSLayoutConstraint constraintWithItem:self.durationTimeLabel
+                                                                      attribute:NSLayoutAttributeHeight
+                                                                      relatedBy:NSLayoutRelationEqual
+                                                                         toItem:self.durationTimeLabel
+                                                                      attribute:NSLayoutAttributeHeight
+                                                                     multiplier:0 constant:44]];
+}
+
+- (void)setupVideoSliderBarView {
+    [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoSliderView
+                                                                   attribute:NSLayoutAttributeCenterY
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.bottomBarView
+                                                                   attribute:NSLayoutAttributeCenterY
+                                                                  multiplier:1.0 constant:0]];
+    
+    [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoSliderView
+                                                                   attribute:NSLayoutAttributeLeft
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.currentTimeLabel
+                                                                   attribute:NSLayoutAttributeRight
+                                                                  multiplier:1.0 constant:1]];
+    
+    [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoSliderView
+                                                                   attribute:NSLayoutAttributeRight
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.durationTimeLabel
+                                                                   attribute:NSLayoutAttributeLeft
+                                                                  multiplier:1.0 constant:-1]];
+    
+    [self.videoSliderView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoSliderView
+                                                                       attribute:NSLayoutAttributeHeight
+                                                                       relatedBy:NSLayoutRelationEqual
+                                                                          toItem:self.videoSliderView
+                                                                       attribute:NSLayoutAttributeHeight
+                                                                      multiplier:0 constant:44]];
+}
+
+- (void)setupMuteButtonConstraints {
+    [self.topBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.muteButton
+                                                                attribute:NSLayoutAttributeCenterY
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.topBarView
+                                                                attribute:NSLayoutAttributeCenterY
+                                                               multiplier:1.0 constant:0]];
+    
+    [self.topBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.muteButton
+                                                                attribute:NSLayoutAttributeRight
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.aspectButton
+                                                                attribute:NSLayoutAttributeLeft
+                                                               multiplier:1.0 constant:0]];
+    
+    [self.muteButton addConstraint:[NSLayoutConstraint constraintWithItem:self.muteButton
+                                                                  attribute:NSLayoutAttributeWidth
+                                                                  relatedBy:NSLayoutRelationEqual
+                                                                     toItem:self.muteButton
+                                                                  attribute:NSLayoutAttributeWidth
+                                                                 multiplier:0 constant:44]];
+    
+    [self.muteButton addConstraint:[NSLayoutConstraint constraintWithItem:self.muteButton
+                                                                  attribute:NSLayoutAttributeHeight
+                                                                  relatedBy:NSLayoutRelationEqual
+                                                                     toItem:self.muteButton
+                                                                  attribute:NSLayoutAttributeHeight
+                                                                 multiplier:0 constant:44]];
+}
+
 - (BOOL)prefersStatusBarHidden {
     return YES;
 }
@@ -430,6 +620,7 @@
     self.playButton.selected = NO;
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideBars) object:nil];
+    [self showBars];
 }
 
 - (void)resetState {
@@ -442,6 +633,47 @@
         if (self.initialPlay) {
             [self play];
         }
+        
+        double duration = self.videoPlayerView.videoPlayerItem.asset.duration.value / self.videoPlayerView.videoPlayerItem.asset.duration.timescale;
+        
+        self.videoSliderView.minimumValue = 0;
+        self.videoSliderView.value = self.initialTime;
+        self.videoSliderView.maximumValue = duration;
+        
+        long minutes = duration / 60;
+        long seconds = (long)duration % 60;
+        
+        self.durationTimeLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", minutes, seconds];
+    }
+}
+
+- (void)videoPlayer:(NHVideoPlayer *)player didChangeCurrentTime:(CMTime)time {
+    double duration = time.value / time.timescale;
+    
+    if (!self.sliderEditing) {
+        self.videoSliderView.value = duration;
+    }
+    
+    long minutes = duration / 60;
+    long seconds = (long)duration % 60;
+    
+    self.currentTimeLabel.text = [NSString stringWithFormat:@"%02ld:%02ld", minutes, seconds];
+}
+
+- (void)videoSliderStartChange:(id)sender {
+    self.sliderEditing = YES;
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideBars) object:nil];
+}
+- (void)videoSliderViewDidChange:(id)sender {
+    [self.videoPlayerView.videoPlayer seekToTime:CMTimeMakeWithSeconds(self.videoSliderView.value, self.videoPlayerView.videoPlayerItem.asset.duration.timescale)];
+}
+
+- (void)videoSliderStopChange:(id)sender {
+    self.sliderEditing = NO;
+    
+    if (self.videoPlayerView.videoPlayer.rate != 0) {
+        [self performSelector:@selector(hideBars) withObject:nil afterDelay:4];
     }
 }
 
