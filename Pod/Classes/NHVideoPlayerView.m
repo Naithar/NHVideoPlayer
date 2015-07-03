@@ -9,6 +9,11 @@
 #import "NHVideoPlayerView.h"
 #import "NHVideoPlayerViewController.h"
 
+#define image(name) \
+[[UIImage alloc] initWithContentsOfFile: \
+[[NSBundle bundleForClass:[NHVideoPlayerView class]]\
+pathForResource:name ofType:@"png"]]
+
 @interface NHVideoPlayerView ()<NHVideoPlayerDelegate, NHVideoPlayerViewControllerDelegate>
 
 @property (nonatomic, strong) UIButton *playButton;
@@ -70,7 +75,7 @@
     self.playButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.playButton.backgroundColor = [UIColor clearColor];
     [self.playButton setTitle:nil forState:UIControlStateNormal];
-    [self.playButton setImage:[UIImage imageNamed:@"NHVideoPlayer.play.png"] forState:UIControlStateNormal];
+    [self.playButton setImage:image(@"NHVideoPlayer.play") forState:UIControlStateNormal];
     self.playButton.imageView.contentMode = UIViewContentModeCenter;
     self.playButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
     self.playButton.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
@@ -96,9 +101,9 @@
     self.muteButton.frame = CGRectMake(0, 0, 35, 35);
     self.muteButton.backgroundColor = [UIColor clearColor];
     self.muteButton.tintColor = [UIColor whiteColor];
-    [self.muteButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.sound.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self.muteButton setImage:[image(@"NHVideoPlayer.sound") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
 
-    [self.muteButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.mute.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateSelected];
+    [self.muteButton setImage:[image(@"NHVideoPlayer.mute") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateSelected];
     [self.muteButton addTarget:self action:@selector(muteButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
     [self.videoDataView addSubview:self.muteButton];
     
@@ -120,7 +125,7 @@
     self.openButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.openButton.tintColor = [UIColor whiteColor];
     [self.openButton setTitle:nil forState:UIControlStateNormal];
-    [self.openButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.zoom.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self.openButton setImage:[image(@"NHVideoPlayer.zoom") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [self.openButton addTarget:self action:@selector(openButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
 //    self.openButton.hidden = YES;
     self.openButton.layer.cornerRadius = 5;

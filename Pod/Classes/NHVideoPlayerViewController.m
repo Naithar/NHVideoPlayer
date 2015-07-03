@@ -8,6 +8,11 @@
 
 #import "NHVideoPlayerViewController.h"
 
+#define image(name) \
+[[UIImage alloc] initWithContentsOfFile: \
+[[NSBundle bundleForClass:[NHVideoPlayerViewController class]]\
+pathForResource:name ofType:@"png"]]
+
 @interface NHVideoPlayerViewController ()<NHVideoPlayerDelegate> {
 }
 
@@ -61,8 +66,7 @@
     self.view.backgroundColor = [UIColor blackColor];
     
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                             initWithImage:[UIImage
-                                                            imageNamed:@"NHVideoPlayer.close.png"]
+                                             initWithImage:image(@"NHVideoPlayer.close")
                                              style:UIBarButtonItemStylePlain
                                              target:self
                                              action:@selector(closeButtonTouch:)];
@@ -87,7 +91,7 @@
     self.closeButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.closeButton.tintColor = [UIColor whiteColor];
     [self.closeButton setTitle:nil forState:UIControlStateNormal];
-    [self.closeButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.close.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self.closeButton setImage:[image(@"NHVideoPlayer.close") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [self.closeButton addTarget:self action:@selector(closeButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
     [self.topBarView addSubview:self.closeButton];
     [self setupCloseButtonConstraints];
@@ -96,7 +100,7 @@
     self.aspectButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.aspectButton.tintColor = [UIColor whiteColor];
     [self.aspectButton setTitle:nil forState:UIControlStateNormal];
-    [self.aspectButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.aspect.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self.aspectButton setImage:[image(@"NHVideoPlayer.aspect") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [self.aspectButton addTarget:self action:@selector(aspectButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
     [self.topBarView addSubview:self.aspectButton];
     [self setupAspectButtonConstraints];
@@ -105,8 +109,8 @@
     self.muteButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.muteButton.backgroundColor = [UIColor clearColor];
     self.muteButton.tintColor = [UIColor whiteColor];
-    [self.muteButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.sound.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-    [self.muteButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.mute.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateSelected];
+    [self.muteButton setImage:[image(@"NHVideoPlayer.sound") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self.muteButton setImage:[image(@"NHVideoPlayer.mute") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateSelected];
     [self.muteButton addTarget:self action:@selector(muteButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
     [self.topBarView addSubview:self.muteButton];
     [self setupMuteButtonConstraints];
@@ -121,7 +125,7 @@
     self.zoomOutButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.zoomOutButton.tintColor = [UIColor whiteColor];
     [self.zoomOutButton setTitle:nil forState:UIControlStateNormal];
-    [self.zoomOutButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.zoom-out.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self.zoomOutButton setImage:[image(@"NHVideoPlayer.zoom-out") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [self.zoomOutButton addTarget:self action:@selector(closeButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
     [self.bottomBarView addSubview:self.zoomOutButton];
     [self setupZoomOutButtonConstraints];
@@ -130,8 +134,8 @@
     self.playButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.playButton.tintColor = [UIColor whiteColor];
     [self.playButton setTitle:nil forState:UIControlStateNormal];
-    [self.playButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.play-main.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-    [self.playButton setImage:[[UIImage imageNamed:@"NHVideoPlayer.pause.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateSelected];
+    [self.playButton setImage:[image(@"NHVideoPlayer.play-main") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self.playButton setImage:[image(@"NHVideoPlayer.pause") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateSelected];
     [self.playButton addTarget:self action:@selector(playButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
     [self.bottomBarView addSubview:self.playButton];
     [self setupPlayButtonConstraints];
@@ -168,7 +172,7 @@
     self.videoSliderView.maximumTrackTintColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.8];
     self.videoSliderView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.bottomBarView addSubview:self.videoSliderView];
-    [self.videoSliderView setThumbImage:[[UIImage imageNamed:@"NHVideoPlayer.slider.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self.videoSliderView setThumbImage:[image(@"NHVideoPlayer.slider") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [self setupVideoSliderBarView];
     [self.videoSliderView addTarget:self action:@selector(videoSliderStartChange:) forControlEvents:UIControlEventTouchDown];
     [self.videoSliderView addTarget:self action:@selector(videoSliderViewDidChange:) forControlEvents:UIControlEventValueChanged];
