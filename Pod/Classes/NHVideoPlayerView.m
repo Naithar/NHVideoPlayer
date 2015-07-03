@@ -10,7 +10,7 @@
 #import "NHVideoPlayerViewController.h"
 
 #define image(name) \
-[[UIImage alloc] initWithContentsOfFile: \
+[UIImage imageWithContentsOfFile: \
 [[NSBundle bundleForClass:[NHVideoPlayerView class]]\
 pathForResource:name ofType:@"png"]]
 
