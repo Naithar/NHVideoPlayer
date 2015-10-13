@@ -43,6 +43,8 @@
 @property (nonatomic, weak) NHVideoPlayer *initialView;
 @property (nonatomic, assign) NSTimeInterval initialTime;
 @property (nonatomic, assign) BOOL initialPlay;
+@property (nonatomic, assign) BOOL initialMute;
+
 
 - (instancetype)initWithPlayerUrl:(NSURL*)playerURL;
 
