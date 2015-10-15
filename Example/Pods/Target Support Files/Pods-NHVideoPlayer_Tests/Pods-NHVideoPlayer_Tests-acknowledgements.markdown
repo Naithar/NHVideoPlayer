@@ -1,9 +1,9 @@
 # Acknowledgements
 This application makes use of the following third party libraries:
 
-## Expecta
+## NHVideoPlayer
 
-Copyright (c) 2011-2015 Specta Team - https://github.com/specta
+Copyright (c) 2015 Naithar <devias.naith@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 
-## NHVideoPlayer
+## Expecta
 
-Copyright (c) 2015 Naithar <devias.naith@gmail.com>
+Copyright (c) 2011-2015 Specta Team - https://github.com/specta
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

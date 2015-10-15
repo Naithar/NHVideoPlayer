@@ -127,7 +127,6 @@ pathForResource:name ofType:@"png"]]
     [self.openButton setTitle:nil forState:UIControlStateNormal];
     [self.openButton setImage:[image(@"NHVideoPlayer.zoom") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [self.openButton addTarget:self action:@selector(openButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
-//    self.openButton.hidden = YES;
     self.openButton.layer.cornerRadius = 5;
     self.openButton.clipsToBounds = YES;
     
@@ -310,6 +309,7 @@ pathForResource:name ofType:@"png"]]
     viewController.initialTime = CMTimeGetSeconds(self.videoPlayer.currentTime);
     viewController.initialPlay = wasPlaying;
     viewController.nhDelegate = self;
+    viewController.initialMute = self.videoPlayer.isMuted;
     
     [UIView transitionWithView:self.window
                       duration:0.5

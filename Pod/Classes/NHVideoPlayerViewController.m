@@ -22,7 +22,7 @@ pathForResource:name ofType:@"png"]]
 @property (nonatomic, strong) UIButton *closeButton;
 @property (nonatomic, strong) UIButton *muteButton;
 @property (nonatomic, strong) UIButton *aspectButton;
-
+@property (nonatomic, strong) UIButton *centerButton;
 
 @property (nonatomic, strong) NHVideoPlayer *videoPlayerView;
 
@@ -62,6 +62,8 @@ pathForResource:name ofType:@"png"]]
     [super viewDidLoad];
 }
 
+
+
 - (void)commonInit {
     self.view.backgroundColor = [UIColor blackColor];
     
@@ -71,6 +73,68 @@ pathForResource:name ofType:@"png"]]
                                              target:self
                                              action:@selector(closeButtonTouch:)];
     
+    [self createComponentViews];
+    
+    [self setupComponentsConstraints];
+    
+    self.tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureAction:)];
+    [self.videoPlayerView addGestureRecognizer:self.tapGesture];
+    
+    [self setBackgroundMode];
+}
+
+- (void)createComponentViews{
+    [self createVideoPlayerView];
+    
+    [self createTopBarView];
+    
+    [self createCloseButton];
+    
+    [self createAspectButton];
+    
+    [self createMuteButton];
+
+    [self createBottomBarView];
+    
+    [self createZoomOutButton];
+    
+    [self createPlayButton];
+
+    [self createCurrentTimeLabel];
+    
+    [self createDurationTimeLabel];
+    
+    [self createSliderView];
+    
+    [self createCenterButton];
+
+}
+
+- (void)setupComponentsConstraints {
+    [self setupVideoPlayerViewConstraints];
+    
+    [self setupTopBarViewConstraints];
+    
+    [self setupCloseButtonConstraints];
+    
+    [self setupAspectButtonConstraints];
+    
+    [self setupMuteButtonConstraints];
+    
+    [self setupBottomBarViewConstraints];
+    
+    [self setupZoomOutButtonConstraints];
+    
+    [self setupPlayButtonConstraints];
+    
+    [self setupCurrentTimeLabelConstraints];
+    
+    [self setupDurationTimeLabelConstraints];
+    
+    [self setupCenterButtonConstraints];
+}
+
+- (void)createVideoPlayerView {
     self.videoPlayerView = [[NHVideoPlayer alloc] initWithFrame:CGRectZero];
     self.videoPlayerView.backgroundColor = [UIColor blackColor];
     self.videoPlayerView.nhDelegate = self;
@@ -78,15 +142,16 @@ pathForResource:name ofType:@"png"]]
     self.videoPlayerView.videoUrl = self.playerURL;
     self.videoPlayerView.videoLayer.videoGravity = AVLayerVideoGravityResizeAspect;
     [self.view addSubview:self.videoPlayerView];
-    [self setupVideoPlayerViewConstraints];
-    
+}
+
+- (void)createTopBarView {
     self.topBarView = [[UIView alloc] init];
     self.topBarView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.75];
     self.topBarView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.topBarView];
-    
-    [self setupTopBarViewConstraints];
-    
+}
+
+- (void)createCloseButton {
     self.closeButton = [UIButton buttonWithType:UIButtonTypeSystem];
     self.closeButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.closeButton.tintColor = [UIColor whiteColor];
@@ -94,8 +159,9 @@ pathForResource:name ofType:@"png"]]
     [self.closeButton setImage:[image(@"NHVideoPlayer.close") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [self.closeButton addTarget:self action:@selector(closeButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
     [self.topBarView addSubview:self.closeButton];
-    [self setupCloseButtonConstraints];
-    
+}
+
+- (void)createAspectButton {
     self.aspectButton = [UIButton buttonWithType:UIButtonTypeSystem];
     self.aspectButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.aspectButton.tintColor = [UIColor whiteColor];
@@ -103,8 +169,9 @@ pathForResource:name ofType:@"png"]]
     [self.aspectButton setImage:[image(@"NHVideoPlayer.aspect") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [self.aspectButton addTarget:self action:@selector(aspectButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
     [self.topBarView addSubview:self.aspectButton];
-    [self setupAspectButtonConstraints];
-    
+}
+
+- (void)createMuteButton {
     self.muteButton = [UIButton buttonWithType:UIButtonTypeCustom];
     self.muteButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.muteButton.backgroundColor = [UIColor clearColor];
@@ -113,14 +180,16 @@ pathForResource:name ofType:@"png"]]
     [self.muteButton setImage:[image(@"NHVideoPlayer.mute") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateSelected];
     [self.muteButton addTarget:self action:@selector(muteButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
     [self.topBarView addSubview:self.muteButton];
-    [self setupMuteButtonConstraints];
-    
+}
+
+- (void)createBottomBarView {
     self.bottomBarView = [[UIView alloc] init];
     self.bottomBarView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.75];
     self.bottomBarView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:self.bottomBarView];
-    [self setupBottomBarViewConstraints];
-    
+}
+
+- (void)createZoomOutButton {
     self.zoomOutButton = [UIButton buttonWithType:UIButtonTypeSystem];
     self.zoomOutButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.zoomOutButton.tintColor = [UIColor whiteColor];
@@ -128,8 +197,9 @@ pathForResource:name ofType:@"png"]]
     [self.zoomOutButton setImage:[image(@"NHVideoPlayer.zoom-out") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [self.zoomOutButton addTarget:self action:@selector(closeButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
     [self.bottomBarView addSubview:self.zoomOutButton];
-    [self setupZoomOutButtonConstraints];
-    
+}
+
+- (void)createPlayButton {
     self.playButton = [UIButton buttonWithType:UIButtonTypeCustom];
     self.playButton.translatesAutoresizingMaskIntoConstraints = NO;
     self.playButton.tintColor = [UIColor whiteColor];
@@ -138,11 +208,9 @@ pathForResource:name ofType:@"png"]]
     [self.playButton setImage:[image(@"NHVideoPlayer.pause") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateSelected];
     [self.playButton addTarget:self action:@selector(playButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
     [self.bottomBarView addSubview:self.playButton];
-    [self setupPlayButtonConstraints];
-    
-    self.tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureAction:)];
-    [self.videoPlayerView addGestureRecognizer:self.tapGesture];
-    
+}
+
+- (void)createCurrentTimeLabel {
     self.currentTimeLabel = [[UILabel alloc] init];
     self.currentTimeLabel.translatesAutoresizingMaskIntoConstraints = NO;
     self.currentTimeLabel.text = @"00:00";
@@ -152,8 +220,9 @@ pathForResource:name ofType:@"png"]]
     [self.bottomBarView addSubview:self.currentTimeLabel];
     self.currentTimeLabel.adjustsFontSizeToFitWidth = YES;
     self.currentTimeLabel.minimumScaleFactor = 0.8;
-    [self setupCurrentTimeLabelConstraints];
-    
+}
+
+- (void)createDurationTimeLabel {
     self.durationTimeLabel = [[UILabel alloc] init];
     self.durationTimeLabel.translatesAutoresizingMaskIntoConstraints = NO;
     self.durationTimeLabel.text = @"00:00";
@@ -163,8 +232,9 @@ pathForResource:name ofType:@"png"]]
     [self.bottomBarView addSubview:self.durationTimeLabel];
     self.durationTimeLabel.adjustsFontSizeToFitWidth = YES;
     self.durationTimeLabel.minimumScaleFactor = 0.8;
-    [self setupDurationTimeLabelConstraints];
-    
+}
+
+- (void)createSliderView {
     self.videoSliderView = [[UISlider alloc] init];
     self.videoSliderView.backgroundColor = [UIColor clearColor];
     self.videoSliderView.minimumTrackTintColor = [UIColor blueColor];
@@ -177,7 +247,24 @@ pathForResource:name ofType:@"png"]]
     [self.videoSliderView addTarget:self action:@selector(videoSliderStartChange:) forControlEvents:UIControlEventTouchDown];
     [self.videoSliderView addTarget:self action:@selector(videoSliderViewDidChange:) forControlEvents:UIControlEventValueChanged];
     [self.videoSliderView addTarget:self action:@selector(videoSliderStopChange:) forControlEvents:UIControlEventTouchCancel|UIControlEventTouchUpInside|UIControlEventTouchUpOutside];
+}
+
+- (void)createCenterButton {
+    self.centerButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.centerButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.centerButton.tintColor = [UIColor whiteColor];
+    [self.centerButton setImage:[image(@"NHVideoPlayer.play-main@3x") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self.centerButton setImage:[image(@"NHVideoPlayer.pause@3x") imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateSelected];
     
+    self.centerButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentFill;
+    self.centerButton.contentVerticalAlignment = UIControlContentVerticalAlignmentFill;
+    self.centerButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    [self.centerButton addTarget:self action:@selector(playButtonTouch:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.videoPlayerView addSubview:self.centerButton];
+}
+
+- (void)setBackgroundMode {
     __weak __typeof(self) weakSelf = self;
     self.resignActive = [[NSNotificationCenter defaultCenter]
                          addObserverForName:UIApplicationWillResignActiveNotification
@@ -199,6 +286,7 @@ pathForResource:name ofType:@"png"]]
                             }];
 }
 
+
 - (void)closeButtonTouch:(id)sender {
     [self dismiss];
 }
@@ -207,7 +295,7 @@ pathForResource:name ofType:@"png"]]
     BOOL wasPlaying = self.videoPlayerView.videoPlayer.rate != 0;
     [self pause];
     NSTimeInterval time = CMTimeGetSeconds(self.videoPlayerView.videoPlayer.currentTime);
-//
+    //
     [UIView transitionWithView:self.view.window
                       duration:0.5
                        options:UIViewAnimationOptionTransitionCrossDissolve
@@ -260,6 +348,7 @@ pathForResource:name ofType:@"png"]]
     [UIView animateWithDuration:0.5 animations:^{
         self.topBarView.alpha = self.topBarView.alpha == 0 ? 1 : 0;
         self.bottomBarView.alpha = self.bottomBarView.alpha == 0 ? 1 : 0;
+        self.centerButton.alpha = self.centerButton.alpha == 0 ? 1: 0;
     }];
 }
 
@@ -267,6 +356,7 @@ pathForResource:name ofType:@"png"]]
     [UIView animateWithDuration:0.5 animations:^{
         self.topBarView.alpha = 1;
         self.bottomBarView.alpha = 1;
+        self.centerButton.alpha = 1;
     }];
 }
 
@@ -274,7 +364,38 @@ pathForResource:name ofType:@"png"]]
     [UIView animateWithDuration:0.5 animations:^{
         self.topBarView.alpha = 0;
         self.bottomBarView.alpha = 0;
+        self.centerButton.alpha = 0;
     }];
+}
+
+- (void) setupCenterButtonConstraints{
+    [self.videoPlayerView addConstraint:[NSLayoutConstraint constraintWithItem:self.centerButton
+                                                                     attribute:NSLayoutAttributeCenterY
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:self.videoPlayerView
+                                                                     attribute:NSLayoutAttributeCenterY
+                                                                    multiplier:1.0 constant:0]];
+    
+    [self.videoPlayerView addConstraint:[NSLayoutConstraint constraintWithItem:self.centerButton
+                                                                     attribute:NSLayoutAttributeCenterX
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:self.videoPlayerView
+                                                                     attribute:NSLayoutAttributeCenterX
+                                                                    multiplier:1.0 constant:0]];
+    
+    [self.centerButton addConstraint:[NSLayoutConstraint constraintWithItem:self.centerButton
+                                                                  attribute:NSLayoutAttributeWidth
+                                                                  relatedBy:NSLayoutRelationEqual
+                                                                     toItem:self.centerButton
+                                                                  attribute:NSLayoutAttributeWidth
+                                                                 multiplier:0 constant:75]];
+    
+    [self.centerButton addConstraint:[NSLayoutConstraint constraintWithItem:self.centerButton
+                                                                  attribute:NSLayoutAttributeHeight
+                                                                  relatedBy:NSLayoutRelationEqual
+                                                                     toItem:self.centerButton
+                                                                  attribute:NSLayoutAttributeHeight
+                                                                 multiplier:0 constant:75]];
 }
 
 - (void)setupVideoPlayerViewConstraints {
@@ -330,27 +451,27 @@ pathForResource:name ofType:@"png"]]
                                                          multiplier:1.0 constant:0]];
     
     [self.topBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.topBarView
-                                                          attribute:NSLayoutAttributeHeight
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.topBarView
-                                                          attribute:NSLayoutAttributeHeight
-                                                         multiplier:0 constant:50]];
+                                                                attribute:NSLayoutAttributeHeight
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.topBarView
+                                                                attribute:NSLayoutAttributeHeight
+                                                               multiplier:0 constant:50]];
 }
 
 - (void)setupCloseButtonConstraints {
     [self.topBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.closeButton
-                                                          attribute:NSLayoutAttributeCenterY
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.topBarView
-                                                          attribute:NSLayoutAttributeCenterY
-                                                         multiplier:1.0 constant:0]];
+                                                                attribute:NSLayoutAttributeCenterY
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.topBarView
+                                                                attribute:NSLayoutAttributeCenterY
+                                                               multiplier:1.0 constant:0]];
     
     [self.topBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.closeButton
-                                                          attribute:NSLayoutAttributeLeft
-                                                          relatedBy:NSLayoutRelationEqual
-                                                             toItem:self.topBarView
-                                                          attribute:NSLayoutAttributeLeft
-                                                         multiplier:1.0 constant:0]];
+                                                                attribute:NSLayoutAttributeLeft
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.topBarView
+                                                                attribute:NSLayoutAttributeLeft
+                                                               multiplier:1.0 constant:0]];
     
     [self.closeButton addConstraint:[NSLayoutConstraint constraintWithItem:self.closeButton
                                                                  attribute:NSLayoutAttributeWidth
@@ -360,11 +481,11 @@ pathForResource:name ofType:@"png"]]
                                                                 multiplier:0 constant:44]];
     
     [self.closeButton addConstraint:[NSLayoutConstraint constraintWithItem:self.closeButton
-                                                                attribute:NSLayoutAttributeHeight
-                                                                relatedBy:NSLayoutRelationEqual
-                                                                   toItem:self.closeButton
-                                                                attribute:NSLayoutAttributeHeight
-                                                               multiplier:0 constant:44]];
+                                                                 attribute:NSLayoutAttributeHeight
+                                                                 relatedBy:NSLayoutRelationEqual
+                                                                    toItem:self.closeButton
+                                                                 attribute:NSLayoutAttributeHeight
+                                                                multiplier:0 constant:44]];
 }
 
 - (void)setupAspectButtonConstraints {
@@ -383,18 +504,18 @@ pathForResource:name ofType:@"png"]]
                                                                multiplier:1.0 constant:0]];
     
     [self.aspectButton addConstraint:[NSLayoutConstraint constraintWithItem:self.aspectButton
-                                                                 attribute:NSLayoutAttributeWidth
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:self.aspectButton
-                                                                 attribute:NSLayoutAttributeWidth
-                                                                multiplier:0 constant:44]];
+                                                                  attribute:NSLayoutAttributeWidth
+                                                                  relatedBy:NSLayoutRelationEqual
+                                                                     toItem:self.aspectButton
+                                                                  attribute:NSLayoutAttributeWidth
+                                                                 multiplier:0 constant:44]];
     
     [self.aspectButton addConstraint:[NSLayoutConstraint constraintWithItem:self.aspectButton
-                                                                 attribute:NSLayoutAttributeHeight
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:self.aspectButton
-                                                                 attribute:NSLayoutAttributeHeight
-                                                                multiplier:0 constant:44]];
+                                                                  attribute:NSLayoutAttributeHeight
+                                                                  relatedBy:NSLayoutRelationEqual
+                                                                     toItem:self.aspectButton
+                                                                  attribute:NSLayoutAttributeHeight
+                                                                 multiplier:0 constant:44]];
 }
 
 - (void)setupBottomBarViewConstraints {
@@ -420,41 +541,41 @@ pathForResource:name ofType:@"png"]]
                                                          multiplier:1.0 constant:0]];
     
     [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.bottomBarView
-                                                                attribute:NSLayoutAttributeHeight
-                                                                relatedBy:NSLayoutRelationEqual
-                                                                   toItem:self.bottomBarView
-                                                                attribute:NSLayoutAttributeHeight
-                                                               multiplier:0 constant:50]];
+                                                                   attribute:NSLayoutAttributeHeight
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.bottomBarView
+                                                                   attribute:NSLayoutAttributeHeight
+                                                                  multiplier:0 constant:50]];
 }
 
 - (void)setupZoomOutButtonConstraints {
     [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.zoomOutButton
-                                                                attribute:NSLayoutAttributeCenterY
-                                                                relatedBy:NSLayoutRelationEqual
-                                                                   toItem:self.bottomBarView
-                                                                attribute:NSLayoutAttributeCenterY
-                                                               multiplier:1.0 constant:0]];
+                                                                   attribute:NSLayoutAttributeCenterY
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.bottomBarView
+                                                                   attribute:NSLayoutAttributeCenterY
+                                                                  multiplier:1.0 constant:0]];
     
     [self.bottomBarView addConstraint:[NSLayoutConstraint constraintWithItem:self.zoomOutButton
-                                                                attribute:NSLayoutAttributeRight
-                                                                relatedBy:NSLayoutRelationEqual
-                                                                   toItem:self.bottomBarView
-                                                                attribute:NSLayoutAttributeRight
-                                                               multiplier:1.0 constant:0]];
+                                                                   attribute:NSLayoutAttributeRight
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.bottomBarView
+                                                                   attribute:NSLayoutAttributeRight
+                                                                  multiplier:1.0 constant:0]];
     
     [self.zoomOutButton addConstraint:[NSLayoutConstraint constraintWithItem:self.zoomOutButton
-                                                                  attribute:NSLayoutAttributeWidth
-                                                                  relatedBy:NSLayoutRelationEqual
-                                                                     toItem:self.zoomOutButton
-                                                                  attribute:NSLayoutAttributeWidth
-                                                                 multiplier:0 constant:44]];
+                                                                   attribute:NSLayoutAttributeWidth
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.zoomOutButton
+                                                                   attribute:NSLayoutAttributeWidth
+                                                                  multiplier:0 constant:44]];
     
     [self.zoomOutButton addConstraint:[NSLayoutConstraint constraintWithItem:self.zoomOutButton
-                                                                  attribute:NSLayoutAttributeHeight
-                                                                  relatedBy:NSLayoutRelationEqual
-                                                                     toItem:self.zoomOutButton
-                                                                  attribute:NSLayoutAttributeHeight
-                                                                 multiplier:0 constant:44]];
+                                                                   attribute:NSLayoutAttributeHeight
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:self.zoomOutButton
+                                                                   attribute:NSLayoutAttributeHeight
+                                                                  multiplier:0 constant:44]];
 }
 
 - (void)setupPlayButtonConstraints {
@@ -473,18 +594,18 @@ pathForResource:name ofType:@"png"]]
                                                                   multiplier:1.0 constant:0]];
     
     [self.playButton addConstraint:[NSLayoutConstraint constraintWithItem:self.playButton
-                                                                   attribute:NSLayoutAttributeWidth
-                                                                   relatedBy:NSLayoutRelationEqual
-                                                                      toItem:self.playButton
-                                                                   attribute:NSLayoutAttributeWidth
-                                                                  multiplier:0 constant:44]];
+                                                                attribute:NSLayoutAttributeWidth
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.playButton
+                                                                attribute:NSLayoutAttributeWidth
+                                                               multiplier:0 constant:44]];
     
     [self.playButton addConstraint:[NSLayoutConstraint constraintWithItem:self.playButton
-                                                                   attribute:NSLayoutAttributeHeight
-                                                                   relatedBy:NSLayoutRelationEqual
-                                                                      toItem:self.playButton
-                                                                   attribute:NSLayoutAttributeHeight
-                                                                  multiplier:0 constant:44]];
+                                                                attribute:NSLayoutAttributeHeight
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.playButton
+                                                                attribute:NSLayoutAttributeHeight
+                                                               multiplier:0 constant:44]];
 }
 
 - (void)setupCurrentTimeLabelConstraints {
@@ -503,18 +624,18 @@ pathForResource:name ofType:@"png"]]
                                                                   multiplier:1.0 constant:0]];
     
     [self.currentTimeLabel addConstraint:[NSLayoutConstraint constraintWithItem:self.currentTimeLabel
-                                                                attribute:NSLayoutAttributeWidth
-                                                                relatedBy:NSLayoutRelationEqual
-                                                                   toItem:self.currentTimeLabel
-                                                                attribute:NSLayoutAttributeWidth
-                                                               multiplier:0 constant:55]];
+                                                                      attribute:NSLayoutAttributeWidth
+                                                                      relatedBy:NSLayoutRelationEqual
+                                                                         toItem:self.currentTimeLabel
+                                                                      attribute:NSLayoutAttributeWidth
+                                                                     multiplier:0 constant:55]];
     
     [self.currentTimeLabel addConstraint:[NSLayoutConstraint constraintWithItem:self.currentTimeLabel
-                                                                attribute:NSLayoutAttributeHeight
-                                                                relatedBy:NSLayoutRelationEqual
-                                                                   toItem:self.currentTimeLabel
-                                                                attribute:NSLayoutAttributeHeight
-                                                               multiplier:0 constant:44]];
+                                                                      attribute:NSLayoutAttributeHeight
+                                                                      relatedBy:NSLayoutRelationEqual
+                                                                         toItem:self.currentTimeLabel
+                                                                      attribute:NSLayoutAttributeHeight
+                                                                     multiplier:0 constant:44]];
 }
 
 - (void)setupDurationTimeLabelConstraints {
@@ -533,18 +654,18 @@ pathForResource:name ofType:@"png"]]
                                                                   multiplier:1.0 constant:0]];
     
     [self.durationTimeLabel addConstraint:[NSLayoutConstraint constraintWithItem:self.durationTimeLabel
-                                                                      attribute:NSLayoutAttributeWidth
-                                                                      relatedBy:NSLayoutRelationEqual
-                                                                         toItem:self.durationTimeLabel
-                                                                      attribute:NSLayoutAttributeWidth
-                                                                     multiplier:0 constant:55]];
+                                                                       attribute:NSLayoutAttributeWidth
+                                                                       relatedBy:NSLayoutRelationEqual
+                                                                          toItem:self.durationTimeLabel
+                                                                       attribute:NSLayoutAttributeWidth
+                                                                      multiplier:0 constant:55]];
     
     [self.durationTimeLabel addConstraint:[NSLayoutConstraint constraintWithItem:self.durationTimeLabel
-                                                                      attribute:NSLayoutAttributeHeight
-                                                                      relatedBy:NSLayoutRelationEqual
-                                                                         toItem:self.durationTimeLabel
-                                                                      attribute:NSLayoutAttributeHeight
-                                                                     multiplier:0 constant:44]];
+                                                                       attribute:NSLayoutAttributeHeight
+                                                                       relatedBy:NSLayoutRelationEqual
+                                                                          toItem:self.durationTimeLabel
+                                                                       attribute:NSLayoutAttributeHeight
+                                                                      multiplier:0 constant:44]];
 }
 
 - (void)setupVideoSliderBarView {
@@ -570,11 +691,11 @@ pathForResource:name ofType:@"png"]]
                                                                   multiplier:1.0 constant:-1]];
     
     [self.videoSliderView addConstraint:[NSLayoutConstraint constraintWithItem:self.videoSliderView
-                                                                       attribute:NSLayoutAttributeHeight
-                                                                       relatedBy:NSLayoutRelationEqual
-                                                                          toItem:self.videoSliderView
-                                                                       attribute:NSLayoutAttributeHeight
-                                                                      multiplier:0 constant:44]];
+                                                                     attribute:NSLayoutAttributeHeight
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:self.videoSliderView
+                                                                     attribute:NSLayoutAttributeHeight
+                                                                    multiplier:0 constant:44]];
 }
 
 - (void)setupMuteButtonConstraints {
@@ -593,28 +714,32 @@ pathForResource:name ofType:@"png"]]
                                                                multiplier:1.0 constant:0]];
     
     [self.muteButton addConstraint:[NSLayoutConstraint constraintWithItem:self.muteButton
-                                                                  attribute:NSLayoutAttributeWidth
-                                                                  relatedBy:NSLayoutRelationEqual
-                                                                     toItem:self.muteButton
-                                                                  attribute:NSLayoutAttributeWidth
-                                                                 multiplier:0 constant:44]];
+                                                                attribute:NSLayoutAttributeWidth
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.muteButton
+                                                                attribute:NSLayoutAttributeWidth
+                                                               multiplier:0 constant:44]];
     
     [self.muteButton addConstraint:[NSLayoutConstraint constraintWithItem:self.muteButton
-                                                                  attribute:NSLayoutAttributeHeight
-                                                                  relatedBy:NSLayoutRelationEqual
-                                                                     toItem:self.muteButton
-                                                                  attribute:NSLayoutAttributeHeight
-                                                                 multiplier:0 constant:44]];
+                                                                attribute:NSLayoutAttributeHeight
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.muteButton
+                                                                attribute:NSLayoutAttributeHeight
+                                                               multiplier:0 constant:44]];
 }
 
 - (BOOL)prefersStatusBarHidden {
     return YES;
 }
 
+
+#pragma mark - Play&Pause&Reset
+
 - (void)play {
     self.videoPlayerView.videoPlayer.rate = 1;
     [self.videoPlayerView.videoPlayer play];
     self.playButton.selected = YES;
+    self.centerButton.selected = YES;
     
     [self performSelector:@selector(hideBars) withObject:nil afterDelay:2];
 }
@@ -623,6 +748,8 @@ pathForResource:name ofType:@"png"]]
     self.videoPlayerView.videoPlayer.rate = 0;
     [self.videoPlayerView.videoPlayer pause];
     self.playButton.selected = NO;
+    self.centerButton.selected = NO;
+    
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideBars) object:nil];
     [self showBars];
@@ -637,6 +764,10 @@ pathForResource:name ofType:@"png"]]
         [self.videoPlayerView.videoPlayer seekToTime:CMTimeMakeWithSeconds(self.initialTime, self.videoPlayerView.videoPlayerItem.asset.duration.timescale)];
         if (self.initialPlay) {
             [self play];
+        }
+        
+        if (self.initialMute) {
+            [self muteButtonTouch:self];
         }
         
         double duration = self.videoPlayerView.videoPlayerItem.asset.duration.value / self.videoPlayerView.videoPlayerItem.asset.duration.timescale;
@@ -694,7 +825,6 @@ pathForResource:name ofType:@"png"]]
 - (void)dealloc {
     [self pause];
     [self.videoPlayerView removeGestureRecognizer:self.tapGesture];
-    [self.videoPlayerView clear];
     [self.videoPlayerView removeFromSuperview];
     self.videoPlayerView = nil;
     
