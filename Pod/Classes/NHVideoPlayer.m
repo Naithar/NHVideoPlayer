@@ -109,8 +109,10 @@
 - (void)setVideoPlayer:(AVPlayer *)videoPlayer {
     [self willChangeValueForKey:@"videoPlayer"];
     [self removeVideoObserver];
-    _videoPlayer = videoPlayer;
-    [self addVideoObserver];
+    _videoPlayer = videoPlayer;    
+    if (_videoPlayer) {
+        [self addVideoObserver];
+    }
     [self didChangeValueForKey:@"videoPlayer"];
 }
 
@@ -203,7 +205,7 @@
     [self.videoPlayer pause];
     self.videoPlayerItem = nil;
     self.videoPlayer = nil;
-    [[self videoLayer] setPlayer:nil];
+//    [[self videoLayer] setPlayer:nil];
     [[self videoLayer] removeFromSuperlayer];
     self.nhDelegate = nil;
     [self stopTimer];

@@ -21,7 +21,7 @@
     [super viewDidLoad];
     
     self.videoPlayer = [[NHVideoPlayerView alloc] initWithFrame:CGRectMake(0, 100, 320, 170)];
-    self.videoPlayer.videoUrl = [NSURL URLWithString:@"http://devimages.apple.com/iphone/samples/bipbop/gear1/prog_index.m3u8"];
+    self.videoPlayer.videoUrl = [NSURL URLWithString:@"http://techslides.com/demos/sample-videos/small.mp4"];
     
     
     [self.view addSubview:self.videoPlayer];
